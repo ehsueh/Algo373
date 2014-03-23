@@ -1,0 +1,11 @@
+## The correct output for this input is 2
+## Remove the bottom box from the first column and swap the bottom box
+## in the second column
+3
+2
+A -
+A A
+B B
+- -
+A A
+A A

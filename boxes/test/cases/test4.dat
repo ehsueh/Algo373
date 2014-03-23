@@ -1,0 +1,11 @@
+## the correct answer for this input is 3
+## remove the top B box and swap the bottom A box from column 1
+## remove the bottom A box from column 2
+3
+2
+B B
+A B
+B A
+- -
+A B
+A B

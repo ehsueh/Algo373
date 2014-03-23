@@ -1,0 +1,10 @@
+## Lines beginning with # denote comments
+## The correct output for this input is 
+## 0
+## 1
+## 2
+3
+0 0 0.666
+1 0 0.666
+2 0 0.666
+

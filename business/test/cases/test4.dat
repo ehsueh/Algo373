@@ -1,0 +1,14 @@
+## One company offers all the services, but it is too expensive
+## The optimal solution comes from choosing some cheaper companies,
+## at the expense of not offering all the services.
+## Buy companies 2 and 3, which offer services {2, 3, 4} at a total cost of
+## 11.0 + 2.0 + 3.0
+4
+3
+3.0
+3.5
+7.5
+8.5
+25.0 1 2 3 4
+11.0 3 4
+2.0 2

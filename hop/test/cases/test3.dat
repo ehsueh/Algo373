@@ -1,0 +1,13 @@
+## Lines beginning with # denote comments
+## The correct output for this input is
+## 0
+## 1
+## 3
+## 2
+## 2
+5
+1 4 1
+1 2 2
+5.5 2 1
+1 0 1
+4 2 1
