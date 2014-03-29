@@ -1,7 +1,6 @@
 ## the correct answer for this input is 3
 ## add an "A" box to column 3
-## remove the A box from the bottom of column 2 and add another
-## "A" box to the top
+## swap both of the bottom boxes of the second column
 3
 3
 - A -
