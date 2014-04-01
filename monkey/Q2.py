@@ -17,7 +17,7 @@ count = 0
 info = [(0, 0)]
 info2 = [(0, 0)]
 neighbours = {}
-neighbours[0] = [0]
+neighbours[(0, 0)] = [0]
 
 fname = sys.argv[1]
 with open(fname) as f:
@@ -41,10 +41,9 @@ with open(fname) as f:
                 t = int(nums[1])
                 info.append((x, t))
                 info2.append((x, t))
-                neighbours[x] = [0]
+                neighbours[(x, t)] = [0]
 
             count += 1
-
 
 def get_next(info):
     """
@@ -90,30 +89,85 @@ while info != []:
 
             # if we can reach the neighbour node in time
             if tot_time >= x_diff:
-                neighbours[info[cur][0]].append(info[i][0])
+                neighbours[info[cur]].append(info[i])
 
     if (info[cur][0] == 0) & (info[cur][1] == 0):
         first = False
     del info[cur]
 
+print (neighbours)
+
+
+### === pruning graph === ###
+# start with neighbours
+# start with source
+# for each neighbour neigh of source,
+
+
+# given a node, 
+# remove all of its neighbours from info2 if they exist
+# call exists on each neighbour
+
+def exists(info2, neighbours, node):
+    """
+    Given a list info2, a dictionary neighbours, and a node,
+    removes itself from info2, and
+    calls exists on all its neighbours.
+    Ultimate result is info2 having nodes that are not reachable.
+    """
+    if node in info2:
+        ind = info2.index(node)
+        del info2[ind]
+    for neigh in neighbours[node][1:]:
+       exists(info2, neighbours, neigh)
+    return None
+
+
+# call exists here, starting with source
+exists(info2, neighbours, (0, 0))
+
+print (info2)
+
+
+# prune neighbours here: remove any nodes that are in info2
+for extra in info2:
+    del neighbours[extra]
+
+print (neighbours)
+
+# check each node cur:
+# if cur has no neighbours, return 0
+# else, for each neighbour of this node,
+#     result = check neighbour
+#     if result == 0 and neighbour is still in info2,
+#         remove neighbour from info2
+### ======================###
+
 
 ### === BELLMAN-FORD === ###
 ### ==================== ###
 items = 0
-
+# current node's number of neighbours:
+# if it has no neighbours, then 
+# for each cur's neighbours, if all of them return -1, 
+num_n = 0 # number of neighbours of current node
+num_k = 0
 
 for i in range(1, n):
-    # for each key in neighbours, check each neighbour
+    # for each reachable key in neighbours, check each of its neighbours
     for key in neighbours:
         for neigh in neighbours[key][1:]:
-             old = neighbours[neigh][0]
-             new = neighbours[key][0] - 1
+            old = neighbours[neigh][0]
+            new = neighbours[key][0] - 1
 
-             if new < old:
-                 neighbours[neigh][0] = new
+            if new < old:
+                neighbours[neigh][0] = new
 
-                 # keep track of how many items caught so far
-                 if new < items:
-                     items = new
+                # keep track of how many items caught so far
+                if new < items:
+                    items = new
+
+            # this node does have neighbours!
+            num_n = 1
 
 print (-items)
