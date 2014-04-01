@@ -39,9 +39,16 @@ with open(fname) as f:
                 nums = line.strip().split() # list of strings
                 x = int(nums[0])
                 t = int(nums[1])
-                info.append((x, t))
-                info2.append((x, t))
-                neighbours[(x, t)] = [0]
+
+                if (x == 0) and (t == 0): # first item is where we are!
+                    ind = info.index((0, 0))
+                    del info[ind]
+                    del info2[ind]
+                    neighbours[(0, 0)] = [-1]
+                else:
+                    info.append((x, t))
+                    info2.append((x, t))
+                    neighbours[(x, t)] = [0]
 
             count += 1
 
@@ -95,8 +102,6 @@ while info != []:
         first = False
     del info[cur]
 
-print (neighbours)
-
 
 ### === pruning graph === ###
 # start with neighbours
@@ -126,14 +131,11 @@ def exists(info2, neighbours, node):
 # call exists here, starting with source
 exists(info2, neighbours, (0, 0))
 
-print (info2)
-
 
 # prune neighbours here: remove any nodes that are in info2
 for extra in info2:
     del neighbours[extra]
 
-print (neighbours)
 
 # check each node cur:
 # if cur has no neighbours, return 0
@@ -146,12 +148,7 @@ print (neighbours)
 
 ### === BELLMAN-FORD === ###
 ### ==================== ###
-items = 0
-# current node's number of neighbours:
-# if it has no neighbours, then 
-# for each cur's neighbours, if all of them return -1, 
-num_n = 0 # number of neighbours of current node
-num_k = 0
+items = neighbours[(0, 0)][0]
 
 for i in range(1, n):
     # for each reachable key in neighbours, check each of its neighbours
@@ -167,7 +164,5 @@ for i in range(1, n):
                 if new < items:
                     items = new
 
-            # this node does have neighbours!
-            num_n = 1
 
 print (-items)
