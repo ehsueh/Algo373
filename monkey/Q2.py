@@ -13,6 +13,7 @@ import math
 #                  remaining indeces are neighbours (x_j) of this node
 ### =================== ###
 
+# TODO: monkey can drop >1 thing at same time, same place
 count = 0
 info = [(0, 0)]
 info2 = [(0, 0)]
@@ -39,12 +40,11 @@ with open(fname) as f:
                 nums = line.strip().split() # list of strings
                 x = int(nums[0])
                 t = int(nums[1])
-
-                if (x == 0) and (t == 0): # first item is where we are!
-                    ind = info.index((0, 0))
-                    del info[ind]
-                    del info2[ind]
-                    neighbours[(0, 0)] = [-1]
+                
+                # if more than one item is dropped at the same time and place
+                if (x, t) in info:
+                    neighbours[(x, t)][0] -= 1
+                    
                 else:
                     info.append((x, t))
                     info2.append((x, t))
@@ -55,95 +55,74 @@ with open(fname) as f:
 def get_next(info):
     """
     Given the list of (position, time) tuples,
-    returns the position of the minimum time.
+    returns the tuple of the smallest time.
     """
-    p = -1
+
     t = float('inf')
     for i in range(len(info)):
         if info[i][1] < t:
-            p = i
             t = info[i][1]
-    return p
+            s = info[i]
+    return s
 
 
-### === BUILD GRAPH === ###
-# for all nodes with bigger t than cur_node,
-#     make edge only if tot_time >= (physical difference)/s
-#     all weights = -1
-#
-# tot_time = (neigh[time] - cur[time]) + h - (cur[time])
-#          = neigh[time] + h - 2*cur[time]
-#
-# first value of values in neighbours: min weight to get there
-### =================== ###
+### build graph ver. 2 ###
+# keep track of which nodes we've visited ==> delete from info
+# 
+# start at (0, 0), and check all of the remaining nodes in info;
+# insert into its neighbours only if reachable
+# remove (0, 0) from info
+# 
+# repeat above each neighbour:
+# check remaining nodes in info;
+# insert into its neighbours only if reachable
+# remove node from info
 
 # from source: one time thing!
 first = True
 
-while info != []:
-    cur = get_next(info)
-    # TODO: what to do if cur == -1?
-    # for all nodes that's not this one
+def populate(info, neighbours, node):
+    """
+    Given a list info, a dictionary neighbours, and a node,
+    for all other nodes in info
+    insert into node's neighbours list only if reachable
+    remove node from info
+    
+    Checks and populates recursively all of node's neighbours list
+    """
+    global first
+    cur = info.index(node)
+    
     for i in range(len(info)):
+        # for all nodes other than this one
         if i != cur:
 
             tot_time = info[i][1] - info[cur][1]
             x_diff   = (float(info[i][0] - info[cur][0])) / float(s)
 
             # from source
-            if (info[cur][0] == 0) & (info[cur][1] == 0) & (first == True):
+            if (info[cur] == (0, 0)) & (first == True):
                 tot_time += h
-
+                
             # if we can reach the neighbour node in time
             if tot_time >= x_diff:
-                neighbours[info[cur]].append(info[i])
+                neighbours[info[cur]].append(info[i])  
 
-    if (info[cur][0] == 0) & (info[cur][1] == 0):
+    if (info[cur] == (0, 0)):
         first = False
+        
+    # remove this node from info, and populate its neighbours
     del info[cur]
-
-
-### === pruning graph === ###
-# start with neighbours
-# start with source
-# for each neighbour neigh of source,
-
-
-# given a node, 
-# remove all of its neighbours from info2 if they exist
-# call exists on each neighbour
-
-def exists(info2, neighbours, node):
-    """
-    Given a list info2, a dictionary neighbours, and a node,
-    removes itself from info2, and
-    calls exists on all its neighbours.
-    Ultimate result is info2 having nodes that are not reachable.
-    """
-    if node in info2:
-        ind = info2.index(node)
-        del info2[ind]
+    neighbours[node][1:] = sorted(neighbours[node][1:], key=lambda x: x[1])
     for neigh in neighbours[node][1:]:
-       exists(info2, neighbours, neigh)
-    return None
+        if neigh in info:
+            populate(info, neighbours, neigh)
+        
+    return
 
 
-# call exists here, starting with source
-exists(info2, neighbours, (0, 0))
-
-
-# prune neighbours here: remove any nodes that are in info2
-for extra in info2:
-    del neighbours[extra]
-
-
-# check each node cur:
-# if cur has no neighbours, return 0
-# else, for each neighbour of this node,
-#     result = check neighbour
-#     if result == 0 and neighbour is still in info2,
-#         remove neighbour from info2
-### ======================###
+populate(info, neighbours, (0, 0))
+### ================== ###
 
 
 ### === BELLMAN-FORD === ###
