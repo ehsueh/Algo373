@@ -16,7 +16,6 @@ import math
 # TODO: monkey can drop >1 thing at same time, same place
 count = 0
 info = [(0, 0)]
-info2 = [(0, 0)]
 neighbours = {}
 neighbours[(0, 0)] = [0]
 
@@ -47,10 +46,36 @@ with open(fname) as f:
                     
                 else:
                     info.append((x, t))
-                    info2.append((x, t))
                     neighbours[(x, t)] = [0]
 
             count += 1
+
+info.sort()
+print ("done initiating vars\n")
+if n > 99:
+    sys.setrecursionlimit(n*n)
+    
+
+### build graph ver. 2 ###
+# keep track of which nodes we've visited ==> delete from info
+# 
+# start at (0, 0), and check all of the remaining nodes in info;
+# insert into its neighbours only if reachable
+# remove (0, 0) from info
+# 
+# repeat above each neighbour:
+# check remaining nodes in info;
+# insert into its neighbours only if reachable
+# remove node from info
+
+### === populate ver. 2 === ###
+### global info2 is for nodes to not recurse into.
+### You can still check them for neighbours!
+#
+# if at the end of a path (no more neighbours!),
+#     return itself? or append itself to the global info2
+# else, grab first thing in info that's not in info2 and call populate
+### ======================= ###
 
 def get_next(info):
     """
@@ -65,65 +90,46 @@ def get_next(info):
             s = info[i]
     return s
 
+no_rec = []
 
-### build graph ver. 2 ###
-# keep track of which nodes we've visited ==> delete from info
-# 
-# start at (0, 0), and check all of the remaining nodes in info;
-# insert into its neighbours only if reachable
-# remove (0, 0) from info
-# 
-# repeat above each neighbour:
-# check remaining nodes in info;
-# insert into its neighbours only if reachable
-# remove node from info
+# valid = valid nodes to search through
+# no_inv = don't investigate these
+def populate2(valid, neighbours, node, no_inv):
+    global no_rec
+    #cur = valid.index(node)
 
-# from source: one time thing!
-first = True
-
-def populate(info, neighbours, node):
-    """
-    Given a list info, a dictionary neighbours, and a node,
-    for all other nodes in info
-    insert into node's neighbours list only if reachable
-    remove node from info
-    
-    Checks and populates recursively all of node's neighbours list
-    """
-    global first
-    cur = info.index(node)
-    
-    for i in range(len(info)):
-        # for all nodes other than this one
-        if i != cur:
-
-            tot_time = info[i][1] - info[cur][1]
-            x_diff   = (float(info[i][0] - info[cur][0])) / float(s)
+    for i in range(len(valid)):
+        # in valid and not in no_investigate
+        if (node not in no_inv):
+            tot_time = valid[i][1] - node[1]
+            x_diff   = (float(valid[i][0] - node[0])) / float(s)
 
             # from source
-            if (info[cur] == (0, 0)) & (first == True):
+            if (node == (0, 0)):
                 tot_time += h
-                
+
             # if we can reach the neighbour node in time
             if tot_time >= x_diff:
-                neighbours[info[cur]].append(info[i])  
+                neighbours[node].append(valid[i])
+                # TODO: have an ancestors list?
 
-    if (info[cur] == (0, 0)):
-        first = False
-        
-    # remove this node from info, and populate its neighbours
-    del info[cur]
-    neighbours[node][1:] = sorted(neighbours[node][1:], key=lambda x: x[1])
-    for neigh in neighbours[node][1:]:
-        if neigh in info:
-            populate(info, neighbours, neigh)
-        
-    return
+                # if valid[i] is not in don't recurse,
+                if valid[i] not in no_rec:
+                    no_rec.append(valid[i])
+                    check = valid[i]
+                    del valid[i]
+                    # ancestors.append(valid[i])
+                    print ("pop2 again with %s\n" % (check,))
+                    no_inv = populate2(valid, neighbours, check, no_inv)
 
-
-populate(info, neighbours, (0, 0))
-### ================== ###
-
+    # investigated all possible neighbours, so add self to no_inv
+    no_inv.append(node)
+    return no_inv
+del info[0]
+print("starting populate2 now\n")
+populate2(info, neighbours, (0,0), [])
+print("done populating\n")
+### ======================== ###
 
 ### === BELLMAN-FORD === ###
 ### ==================== ###
@@ -136,12 +142,13 @@ for i in range(1, n):
             old = neighbours[neigh][0]
             new = neighbours[key][0] - 1
 
-            if new < old:
+            if new < old: 
                 neighbours[neigh][0] = new
 
                 # keep track of how many items caught so far
                 if new < items:
                     items = new
+                    print (items)
 
 
 print (-items)
