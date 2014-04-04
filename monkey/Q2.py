@@ -51,7 +51,7 @@ with open(fname) as f:
             count += 1
 
 info.sort()
-print ("done initiating vars\n")
+
 if n > 99:
     sys.setrecursionlimit(n*n)
     
@@ -82,13 +82,13 @@ def get_next(info):
     Given the list of (position, time) tuples,
     returns the tuple of the smallest time.
     """
-
+    p = -1
     t = float('inf')
     for i in range(len(info)):
         if info[i][1] < t:
             t = info[i][1]
-            s = info[i]
-    return s
+            p = i
+    return p
 
 no_rec = []
 
@@ -96,9 +96,11 @@ no_rec = []
 # no_inv = don't investigate these
 def populate2(valid, neighbours, node, no_inv):
     global no_rec
-    #cur = valid.index(node)
-
-    for i in range(len(valid)):
+    #global valid
+    
+    while valid != []:
+        i = get_next(valid)
+    #for i in range(len(valid)):
         # in valid and not in no_investigate
         if (node not in no_inv):
             tot_time = valid[i][1] - node[1]
@@ -107,48 +109,55 @@ def populate2(valid, neighbours, node, no_inv):
             # from source
             if (node == (0, 0)):
                 tot_time += h
-
+                
+            check = valid[i]
+            del valid[i]
+            
             # if we can reach the neighbour node in time
             if tot_time >= x_diff:
-                neighbours[node].append(valid[i])
-                # TODO: have an ancestors list?
+                neighbours[node].append(check)
 
                 # if valid[i] is not in don't recurse,
-                if valid[i] not in no_rec:
-                    no_rec.append(valid[i])
-                    check = valid[i]
-                    del valid[i]
+                if check not in no_rec:
+                    no_rec.append(check)
+                    
                     # ancestors.append(valid[i])
-                    print ("pop2 again with %s\n" % (check,))
+                    #print ("pop2 again with %s\n" % (check,))
                     no_inv = populate2(valid, neighbours, check, no_inv)
 
     # investigated all possible neighbours, so add self to no_inv
     no_inv.append(node)
     return no_inv
 del info[0]
-print("starting populate2 now\n")
+#print("starting populate2 now\n")
 populate2(info, neighbours, (0,0), [])
-print("done populating\n")
+#print("done populating\n")
+
 ### ======================== ###
 
 ### === BELLMAN-FORD === ###
 ### ==================== ###
-items = neighbours[(0, 0)][0]
 
-for i in range(1, n):
-    # for each reachable key in neighbours, check each of its neighbours
-    for key in neighbours:
-        for neigh in neighbours[key][1:]:
-            old = neighbours[neigh][0]
-            new = neighbours[key][0] - 1
+def bellman_ford():
+    items = neighbours[(0, 0)][0]
+    
+    for i in range(1, n):
+        # for each reachable key in neighbours, check each of its neighs
+        for key in neighbours:
+            for neigh in neighbours[key][1:]:
+                old = neighbours[neigh][0]
+                new = neighbours[key][0] - 1
+    
+                if new < old: 
+                    neighbours[neigh][0] = new
+    
+                    # keep track of how many items caught so far
+                    if new < items:
+                        items = new
+                        if items == -n:
+                            #print ("done!")
+                            return items
+    return items
 
-            if new < old: 
-                neighbours[neigh][0] = new
-
-                # keep track of how many items caught so far
-                if new < items:
-                    items = new
-                    print (items)
-
-
+items = bellman_ford()
 print (-items)
