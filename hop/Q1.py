@@ -30,7 +30,7 @@ fname = sys.argv[1]
 with open(fname) as f:
     for line in f:
         # read only if the line doesn't start with #
-        if line[0] != "#":
+        if (line[0] != "#") & (line[0] != "") & (line[0] != "\n"):
             try:
                 n
             except NameError: # we're at the first line
@@ -53,14 +53,40 @@ neighbours[0][0] = 0
         #add a_i to value list of a_e
         
 # populate neighbours
-for nodes in range(n): # index
+for node in range(n): # index
     for agent in neighbours: # use as index in info
-        if nodes != agent:
-            old = info[nodes]
+        if node != agent:
+            old = info[node]
             new = info[agent]
             if reachable(new[0], new[1], new[2], old[0], old[1], old[2]):
-                neighbours[nodes].append(agent)
+                # neighbour doesn't have me in his neighbour list
+                if node not in neighbours[agent]:
+                    neighbours[node].append(agent)
+                    neighbours[agent][0] = neighbours[node][0] + 1
+                    
+                # neighbour DOES have me in his neighbour list, but re-evaluate
+                elif node in neighbours[agent]:
+                    if neighbours[node][0] < neighbours[agent][0]:
+                        neighbours[node].append(agent)
+                        # delete myself from neighbour's list
+                        where = neighbours[agent].index(node)
+                        del neighbours[agent][where]
+                        neighbours[agent][0] = neighbour[node][0] + 1
+                elif (node not in neighbours[agent]) & (agent not in neighbours[node]):
+                    neighbours[node].append(agent)
         
+
+# if agent is not in my list, add it
+# when do we want to add a neighbour?
+
+# if agent is not in my list, add it
+# when do we want to add a neighbour?
+# > if neighbour doesn't have me in his neighbour list
+# >    then add neighbour to my list
+# but if neighbour does have me in his neighbour list,
+# check:
+#     > if my distance is smaller than neighbour,
+#     > add neighbour to my list, and remove me from his list
 
 # BBBB ==== building graph ==== BBBB
 ### edges between each key in neighbours and each entry in its value list
@@ -68,7 +94,8 @@ for nodes in range(n): # index
 # we don't need the 'previous' array; it's inefficient anyway
 # we just need the dist; dist of a neighbour = current dist + 1
 
-
+                    
+                                        
 # CCCC ==== dijkstra's ==== CCCC
 def min_dist(avail, agents):
     """
