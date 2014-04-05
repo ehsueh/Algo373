@@ -38,13 +38,13 @@ for (int i=1; i<len_s+1; i++)
 	for(int j=1; j<len_t+1; j++) { 
 		iterations++;
 		// uncomment to show steps
-		cout << "s sub: " << s.substr(0,i) << endl << "t sub: "<< t.substr(0,j) << endl;
+		//cout << "s sub: " << s.substr(0,i) << endl << "t sub: "<< t.substr(0,j) << endl;
 		if (s.substr(i-1,1) == t.substr(j-1,1)) {//string index starts at zero. D[0,0] for empty strings
 			D[i * len_t + j] = D[(i-1) * len_t + j-1];
 			// uncomment to show steps
-			cout << "i,j = " << i << "," << j << endl;
-			cout << s.substr(i-1,1) << "==" << t.substr(j-1,1) << endl << "D[i][j]: " << D[i * len_t + j] << endl;
-			cout << "--------" << iterations << endl;
+			//cout << "i,j = " << i << "," << j << endl;
+			//cout << s.substr(i-1,1) << "==" << t.substr(j-1,1) << endl << "D[i][j]: " << D[i * len_t + j] << endl;
+			//cout << "--------" << iterations << endl;
 		} else { 
 			if (i <= j) {
 				if (i == len_s){
@@ -75,8 +75,8 @@ for (int i=1; i<len_s+1; i++)
 				}
 			}
 				// uncomment to show steps 
-cout << "D[i][j]: " << D[i * len_t + j] << endl;
-cout << "--------" << iterations << endl;
+//cout << "D[i][j]: " << D[i * len_t + j] << endl;
+//cout << "--------" << iterations << endl;
 
 		}
 	};
@@ -125,18 +125,18 @@ int main(int argc, char ** argv)
 			std::string s = strings[i];
 			std::string t = strings[i + cno];
 			// uncomment below to see steps
-			cout << "string s: " << s << endl;
-			cout << "string t: " << t << endl;
+			//cout << "string s: " << s << endl;
+			//cout << "string t: " << t << endl;
 			levDist = LevDist(s, t, s.size(), t.size());
 			sum += levDist;
 			// uncomment below to see steps
-			cout << "LevDist: " << levDist << endl << endl;
+			//cout << "LevDist: " << levDist << endl << endl;
 		}
 
 		cout << sum << endl;
 		stop = clock();
 		double timeTaken = (double) (stop - start)/ CLOCKS_PER_SEC;
-		cout << "Time taken: " << timeTaken << "sec" << endl;
+		//cout << "Time taken: " << timeTaken << "sec" << endl;
 
 	} else {
 		cout << "usage: " << argv[0] << " <input file>" << endl;
