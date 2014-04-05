@@ -3,8 +3,6 @@ Algo373
 
 Algo373 Coding Project
 
-Grace Lin  996080501 
-Emma Hsueh 998968951 
 
 Q1 hop
 Q2 monkey
